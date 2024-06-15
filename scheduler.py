@@ -4,16 +4,26 @@ from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.jobstores.mongodb import MongoDBJobStore
 from pymongo import MongoClient
 from pymongo.errors import OperationFailure
+import redis
 import time
 
+redis_client = redis.StrictRedis(host="ais-redis", port=6379, db=0)
 app = Flask(__name__)
 
 client = MongoClient("", tlsAllowInvalidCertificates=True)
-db = client["test"]
+db = client["ais"]
 collection = db["schedules"]
 
 def my_scheduled_job(job_id):
-    print(f"Executing job {job_id}", flush=True)
+    lock_key=f'job_lock:{job_id}'
+    current_time = int(time.time())
+
+    if redis_client.set(lock_key, current_time, ex=60, nx=True):
+        print(f"Executing job {job_id}", flush=True)
+        time.sleep(5)
+        redis_client.delete(lock_key)
+    else:
+        print(f"Skipping job {job_id}. Another container is executing", flush=True)
 
 def update_schedules(scheduler):
     jobs = collection.find({"status": "pending"})
@@ -40,7 +50,7 @@ def update_schedules(scheduler):
                 print("Job added")
 
 jobstores = {
-    "default": MongoDBJobStore(database="test", collection="cron-schedules", client=client)
+    "default": MongoDBJobStore(database="ais", collection="cron-schedules", client=client)
 }
 
 executors = {
