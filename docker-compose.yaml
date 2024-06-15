@@ -1,0 +1,15 @@
+services:
+  scheduler:
+    image: scheduler
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes: ./:/app
+    deploy:
+      replicas: 3
+
+  redis:
+    image: redis:latest
+    container_name: "redis"
+    ports:
+      - 6379:6379
