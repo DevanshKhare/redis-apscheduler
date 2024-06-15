@@ -8,8 +8,8 @@ import time
 
 app = Flask(__name__)
 
-client = MongoClient("mongodb+srv://devanshkhare0:84to1A4zzfCeMo2f@test.upbydsb.mongodb.net/?retryWrites=true&w=majority&appName=test", tlsAllowInvalidCertificates=True)
-db = client["ais"]
+client = MongoClient("", tlsAllowInvalidCertificates=True)
+db = client["test"]
 collection = db["schedules"]
 
 def my_scheduled_job(job_id):
@@ -40,7 +40,7 @@ def update_schedules(scheduler):
                 print("Job added")
 
 jobstores = {
-    "default": MongoDBJobStore(database="ais", collection="cron-schedules", client=client)
+    "default": MongoDBJobStore(database="test", collection="cron-schedules", client=client)
 }
 
 executors = {
