@@ -63,6 +63,13 @@ scheduler.start()
 update_schedules(scheduler)
 
 
+try:
+    with collection.watch(full_document="updateLookup") as stream:
+        for change in stream:
+            update_schedules(scheduler)
+except OperationFailure as e:
+    print(f"Error: {e}")
+
 try: 
     while True:
         pass
