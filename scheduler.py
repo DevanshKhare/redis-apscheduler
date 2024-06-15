@@ -7,11 +7,11 @@ from pymongo.errors import OperationFailure
 import redis
 import time
 
-redis_client = redis.StrictRedis(host="ais-redis", port=6379, db=0)
+redis_client = redis.StrictRedis(host="test-redis", port=6379, db=0)
 app = Flask(__name__)
 
 client = MongoClient("", tlsAllowInvalidCertificates=True)
-db = client["ais"]
+db = client["test"]
 collection = db["schedules"]
 
 def my_scheduled_job(job_id):
@@ -50,7 +50,7 @@ def update_schedules(scheduler):
                 print("Job added")
 
 jobstores = {
-    "default": MongoDBJobStore(database="ais", collection="cron-schedules", client=client)
+    "default": MongoDBJobStore(database="test", collection="cron-schedules", client=client)
 }
 
 executors = {
